@@ -1,7 +1,3 @@
-/**
- * @author Mohamed Mohamed
- * id number:w18309586
- */
 package w1830958.CourseWork;
 
 import javax.swing.*;
@@ -13,19 +9,17 @@ import java.util.ArrayList;
 
 public class PrintAppointments extends AbstractTableModel {
 
-    ArrayList<Doctor> Doctorlist;
-    int count = 0;
+    ArrayList<Doctor> doctorList;
+    private final String[] columnNames = {"Doctor Full Name", "Medical License Number", "Consultations"};
 
-    private final String[] columnNames = {"Doctor Full Name", "Doctor Medical license number", "Consultations"};
-
-    //contractor
-    public PrintAppointments(ArrayList<Doctor> doctorlist) {
-        Doctorlist = doctorlist;
+    // Constructor
+    public PrintAppointments(ArrayList<Doctor> doctorList) {
+        this.doctorList = doctorList;
     }
 
     @Override
     public int getRowCount() {
-        return Doctorlist.size();
+        return doctorList.size();
     }
 
     @Override
@@ -35,100 +29,97 @@ public class PrintAppointments extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Object temp = "list is empty";
+        Doctor doctor = doctorList.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                temp = Doctorlist.get(rowIndex).getFirstName() + " " + Doctorlist.get(rowIndex).getSurName();
-                break;
+                return doctor.getFirstName() + " " + doctor.getSurName();
             case 1:
-                temp = Doctorlist.get(rowIndex).getMLN();
-                break;
+                return doctor.getMLN();
             case 2:
-                temp = Doctorlist.get(rowIndex).getAppointmentList();
-
+                return doctor.getAppointmentList().toString(); // Adjust this as needed
+            default:
+                return null;
         }
-        return temp;
-
     }
 
+    @Override
     public String getColumnName(int col) {
         return columnNames[col];
     }
 
-    public void run(ArrayList<Doctor> doctolist) {
-        JFrame frame1 = new JFrame();
-        PrintAppointments tableModel = new PrintAppointments(doctolist);
+    public void run(ArrayList<Doctor> doctorList) {
+        JFrame frame = new JFrame("Doctor Appointments");
+        PrintAppointments tableModel = new PrintAppointments(doctorList);
         JTable myTable = new JTable(tableModel);
-        JScrollPane mytable = new JScrollPane(myTable);
-        frame1.add(mytable);
-        JButton button = new JButton("Decrypt note");
-        button.setSize(1400, 50);
-        button.setBackground(Color.CYAN);
-        frame1.add(button, BorderLayout.PAGE_END);
-        button.addMouseListener(new MouseListener() {
+        JScrollPane scrollPane = new JScrollPane(myTable);
+        frame.add(scrollPane);
+
+        JButton decryptButton = new JButton("Decrypt Note");
+        frame.add(decryptButton, BorderLayout.PAGE_END);
+        decryptButton.setPreferredSize(new Dimension(600, 50));
+        decryptButton.setBackground(Color.CYAN);
+
+        decryptButton.addMouseListener(new MouseListener() {
+            private boolean isDecrypted = false;
+
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (count < 1) {
-
-                    decrypt();
-                    frame1.dispose();
-                    count++;
-                    tableModel.run(doctolist);
-                    JOptionPane.showMessageDialog(button, "data has been decrypted.");
-
+                if (!isDecrypted) {
+                    decryptNotes();
+                    frame.dispose();
+                    run(doctorList);
+                    JOptionPane.showMessageDialog(null, "Notes decrypted.");
+                    isDecrypted = true;
                 } else {
-                    JOptionPane.showMessageDialog(button, "date already decrypted.");
+                    JOptionPane.showMessageDialog(null, "Already decrypted.");
                 }
             }
 
+
+
+            // In PrintAppointments class
+            private void decryptNotes() {
+                for (Doctor doctor : doctorList) {
+                    for (Consultation consultation : doctor.getAppointmentList()) {
+                        String decryptedNote = decrypt(consultation.getNotes());
+                        consultation.setNotes(decryptedNote);  // Replace the encrypted note with the decrypted version
+                    }
+                }
+            }
+
+            // Decrypt method that reverses the encryption
+            private String decrypt(String encryptedText) {
+                StringBuilder decrypted = new StringBuilder();
+                int key = 5;  // Same key that was used for encryption
+
+                for (int i = 0; i < encryptedText.length(); i++) {
+                    char decryptedChar = (char) (encryptedText.charAt(i) ^ key);  // XOR again with the same key
+                    decrypted.append(decryptedChar);  // Append decrypted character
+                }
+
+                return decrypted.toString();  // Return the decrypted string
+            }
+
+
             @Override
             public void mousePressed(MouseEvent e) {
-
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-
             }
         });
-        frame1.setSize(1400, 700);
-        frame1.setVisible(true);
+
+        frame.setSize(1400, 700);
+        frame.setVisible(true);
     }
-
-    public void decrypt() {
-
-        for (int i = 0; i < Doctorlist.size(); i++) {
-            for (int j = 0; j < Doctorlist.get(i).getAppointmentList().size(); j++) {
-                String note = decrypt(Doctorlist.get(i).getAppointmentList().get(j).getNotes());
-
-                Doctorlist.get(i).getAppointmentList().get(j).setNotes(note);
-            }
-        }
-    }
-
-    public static String decrypt(String str) {
-
-        str = str.replace("-", "");
-        String result = "";
-        try {
-            for (int i = 0; i < str.length(); i += 3) {
-                String hex = str.substring(i + 1, i + 3);
-                result += (char) (Integer.parseInt(hex, 16) ^ (Integer.parseInt(String.valueOf(str.charAt(i)))));
-            }
-        } catch (Exception e) {
-            System.out.println();
-        }
-        return result;
-    }
-
 }
+

@@ -26,7 +26,7 @@ public class Date {
 
     }
 
-    
+
 
     public void setDay() {
         boolean a = false;
@@ -71,7 +71,7 @@ public class Date {
         while (!a) {
             try {
                 int y = Integer.parseInt(in.nextLine());
-                if (y >= 1905 && y<=2023) {
+                if (y >= 1905 && y<=2024) {
                     this.year = y;
                     a = true;
                 } else {

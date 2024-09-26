@@ -1,42 +1,37 @@
-
-
-/**
- * @author Mohamed Mohamed
- * id number:w18309586
- */
 package w1830958.CourseWork;
 
-public class Consultation  {
+public class Consultation {
+
     private Time bookingTime;
-    private Date BookDate;
+    private Date bookingDate;  // Use your custom Date class here
     private String notes;
     private Patient patient;
     private float cost;
 
-    Consultation() {
-                notes=null;
+    public Consultation() {
+        this.notes = "";
+        this.cost = 0.0f;
     }
 
-
-
-
-
+    // Getter and Setter for booking time
     public Time getBooking() {
         return bookingTime;
     }
 
-    public void setBooking(Time booking) {
-        this.bookingTime = booking;
+    public void setBooking(Time bookingTime) {
+        this.bookingTime = bookingTime;
     }
 
+    // Getter and Setter for booking date (using your custom Date class)
     public Date getDate() {
-        return BookDate;
+        return bookingDate;
     }
 
-    public void setDate(Date date) {
-        this.BookDate = date;
+    public void setDate(Date bookingDate) {
+        this.bookingDate = bookingDate;
     }
 
+    // Getter and Setter for notes
     public String getNotes() {
         return notes;
     }
@@ -45,33 +40,26 @@ public class Consultation  {
         this.notes = notes;
     }
 
-    public float getCost() {
-        return cost;
-    }
-
-    public void setCost(int cost) {
-
-        this.cost = cost;
-    }
-
+    // Getter and Setter for patient
     public Patient getPatient() {
         return patient;
     }
 
     public void setPatient(Patient patient) {
-
         this.patient = patient;
+    }
+
+    // Getter and Setter for cost
+    public float getCost() {
+        return cost;
+    }
+
+    public void setCost(float cost) {
+        this.cost = cost;
     }
 
     @Override
     public String toString() {
-        return " patient:" + patient +"booking:" +BookDate+", " + bookingTime +  ", notes: " + notes +  ", cost: £" + cost ;
+        return "Patient: " + patient + ", Booking Date: " + bookingDate + ", Time: " + bookingTime + ", Notes: " + notes + ", Cost: £" + cost;
     }
-
-
-
-
-
-
-
 }

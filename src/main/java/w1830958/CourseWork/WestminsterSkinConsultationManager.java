@@ -1,130 +1,154 @@
-/**
- * @author Mohamed Mohamed
- * id number:w18309586
- */
 package w1830958.CourseWork;
-//imported statements
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
-//Main class with ArrayList for Doctor List
 public class WestminsterSkinConsultationManager implements SkinConsultationManager {
 
-    private ArrayList<Doctor> DoctorList;
+    private ArrayList<Doctor> doctorList;
 
     public WestminsterSkinConsultationManager() {
-        DoctorList = new ArrayList<>();
+        doctorList = new ArrayList<>();
     }
-    //getter and setter for ArrayList
 
     public ArrayList<Doctor> getDoctorList() {
-        return DoctorList;
+        return doctorList;
     }
 
-    public void setDoctorList(ArrayList<Doctor> DoctorList) {
-        this.DoctorList = DoctorList;
-    }
-
-    //addDoctor method to allow the pbject doctor to be added to array when choice 1 selected
     @Override
     public void addDoctors(Doctor doctor) {
-        int count = 10;
-        if (DoctorList.size() < count) {
-            DoctorList.add(doctor);
+        if (doctorList.size() < 10) { // Example capacity
+            doctorList.add(doctor);
+            System.out.println("Doctor has been added to the list.");
         } else {
-            System.out.println("list is full.");
+            System.out.println("List is full. Cannot add more doctors.");
         }
     }
 
-    //Display method to display the content of array when choice 3 selected.
+    public void deleteDoctor(int medicalLicenseNumber) {
+        Doctor doctorToDelete = null;
+        for (Doctor doctor : doctorList) {
+            if (doctor.getMLN() == medicalLicenseNumber) {
+                doctorToDelete = doctor;
+                break;
+            }
+        }
+
+        if (doctorToDelete != null) {
+            doctorList.remove(doctorToDelete);
+            System.out.println("Doctor has been removed from the list.");
+        } else {
+            System.out.println("Doctor with the given license number not found.");
+        }
+    }
+
     @Override
     public void Display() {
-        Collections.sort(DoctorList);
-        if (!DoctorList.isEmpty()) {
-            for (Doctor doctor : DoctorList) {
-
+        Collections.sort(doctorList);
+        if (!doctorList.isEmpty()) {
+            for (Doctor doctor : doctorList) {
                 System.out.println(doctor.toString());
             }
         } else {
-            System.out.println("List is empty ");
+            System.out.println("Doctor list is empty.");
         }
-
     }
 
-    //        menu of choices to be printed when program run
+    public void saveDoctorList() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("doctors.csv"))) {
+            for (Doctor doctor : doctorList) {
+                writer.write(String.format("%s,%s,%s,%s,%s,%d\n",
+                        doctor.getFirstName(),
+                        doctor.getSurName(),
+                        doctor.getDateOfBirth(),
+                        doctor.getPhoneNumber() != null ? doctor.getPhoneNumber().toString() : "N/A", // Handling null phone numbers
+                        doctor.getSpecialisation(),
+                        doctor.getMLN()));
+            }
+            System.out.println("Doctor list saved successfully.");
+        } catch (IOException e) {
+            System.out.println("Error saving doctor list: " + e.getMessage());
+        }
+    }
+
+    public void loadDoctorList() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("doctors.csv"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                Doctor doctor = new Doctor();
+                doctor.setFirstName(data[0]);
+                doctor.setSurName(data[1]);
+                doctor.loadsetDateOfBirth(data[2]);
+                doctor.loadPhoneNumber(data[3]);
+                doctor.loadSpecialisation(data[4]);
+                doctor.setMLN(Integer.parseInt(data[5]));
+                doctorList.add(doctor);
+            }
+            System.out.println("Doctor list loaded successfully.");
+        } catch (IOException e) {
+            System.out.println("Error loading doctor list: " + e.getMessage());
+        }
+    }
+
     @Override
     public void menu() {
-        System.out.println("1:  Input a doctor information.");
-        System.out.println("2:  Delete a doctor information.");
-        System.out.println("3:  Display a list of doctors information.");
-        System.out.println("4:  Store a doctors information to text file.");
-        System.out.println("5:  Retrieve a doctors information privously stored to text file.");
-        System.out.println("6:  Run GUI to print list of doctor on table.");
-        System.out.println("7:  Run GUI for booked Appointments with doctors.");
-        System.out.println("8:  Terminate the program.");
-
+        System.out.println("1: Input a doctor");
+        System.out.println("2: Delete a doctor");
+        System.out.println("3: Display doctor list");
+        System.out.println("4: Save doctor list");
+        System.out.println("5: Load doctor list");
+        System.out.println("6: Run GUI");
+        System.out.println("7: Exit");
     }
 
-    //main program run
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        //creating an instance of ArrayList that is created above the main
-        WestminsterSkinConsultationManager doctorList = new WestminsterSkinConsultationManager();
-        //boolean for loop to initalsation to run the switch as many as needed.
-        boolean loop = false;
+        WestminsterSkinConsultationManager manager = new WestminsterSkinConsultationManager();
+        Scanner scanner = new Scanner(System.in);
 
-//        //while loop initialisation
-        while (!loop) {
-//            //Scanner to get inputs
-//            //creating an instance of doctor object
-            Doctor doctor = new Doctor();
+        while (true) {
+            manager.menu();
+            System.out.println("Enter your choice:");
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // Consume newline
 
-//            //creating an instance of GUI class
-//
-            try {  //try error handling setting
-                doctorList.menu();
-                System.out.println("enter a number representing one of the choices.");
-//                //integer value to collect choice selected for menu
-                int input = Integer.parseInt(in.nextLine());
-//                //switch case to process the input choice selected by user.
-                switch (input) {
-                    //Case numbers and task to be completed when number entered by user
-
-                    case 1 -> {
-                        doctor.Add(doctorList, doctor);
-                        System.out.println("Doctor has been added to the list.");
-
-                    }
-                    case 2 ->
-                        doctor.Delete(in, doctorList);
-                    case 3 ->
-                        doctorList.Display();
-                    case 4 ->
-                        doctor.save(doctorList);
-                    case 5 ->
-                        doctor.load(doctorList);
-                    case 6 -> {
-                        GUI gui = new GUI(doctorList);
-                        gui.RunTable(doctorList);
-                    }
-                    case 7 -> {
-                        PrintAppointments printAppoitments=new PrintAppointments(doctorList.getDoctorList());
-                        printAppoitments.run(doctorList.getDoctorList());
-
-                    }
-                    case 8 ->{
-                        System.exit(0);}
-                    default ->
-                        System.out.println("invalid input try again.");
+            switch (choice) {
+                case 1 -> {
+                    Doctor doctor = new Doctor();
+                    System.out.println("Enter doctor's first name:");
+                    doctor.setFirstName(scanner.nextLine());
+                    System.out.println("Enter doctor's last name:");
+                    doctor.setSurName(scanner.nextLine());
+                    System.out.println("Enter doctor's date of birth (dd/MM/yyyy):");
+                    doctor.loadsetDateOfBirth(scanner.nextLine());
+                    System.out.println("Enter doctor's phone number:");
+                    doctor.loadPhoneNumber(scanner.nextLine());
+                    System.out.println("Enter doctor's specialization:");
+                    doctor.loadSpecialisation(scanner.nextLine());
+                    System.out.println("Enter doctor's medical license number:");
+                    doctor.setMLN(scanner.nextInt());
+                    manager.addDoctors(doctor);
                 }
-//catch to catch any number format error type entered by user.
-            } catch (NumberFormatException ex) {
-                System.out.println("the input is not an number. please enter a number.");
+                case 2 -> {
+                    System.out.println("Enter the medical license number of the doctor to delete:");
+                    int medicalLicenseNumber = scanner.nextInt();
+                    manager.deleteDoctor(medicalLicenseNumber);
+                }
+                case 3 -> manager.Display();
+                case 4 -> manager.saveDoctorList();
+                case 5 -> manager.loadDoctorList();
+                case 6 -> {
+                    GUI gui = new GUI(manager);
+                    gui.RunTable(manager);
+                }
+                case 7 -> {
+                    System.out.println("Exiting the program.");
+                    System.exit(0);
+                }
+                default -> System.out.println("Invalid choice. Please try again.");
             }
         }
-
     }
-
 }
